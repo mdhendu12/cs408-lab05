@@ -1,10 +1,10 @@
 package edu.jsu.mcis.cs408.lab05;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.beans.PropertyChangeEvent;
 
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements AbstractView {
 
         model.initDefault();
 
-        binding.getButton.setOnClickListener(new View.OnClickListener() {
+        binding.deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 controller.sendGetRequest();

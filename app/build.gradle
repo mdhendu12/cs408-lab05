@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'edu.jsu.mcis.cs408.webservicesdemo'
+    namespace 'edu.jsu.mcis.cs408.lab05'
     compileSdk 33
 
     buildFeatures {
@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "edu.jsu.mcis.cs408.webservicesdemo"
+        applicationId "edu.jsu.mcis.cs408.lab05"
         minSdk 22
         targetSdk 33
         versionCode 1
