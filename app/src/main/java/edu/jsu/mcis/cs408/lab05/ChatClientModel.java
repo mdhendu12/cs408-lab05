@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -17,22 +18,25 @@ import java.util.concurrent.Future;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class ExampleWebServiceModel extends AbstractModel {
+public class ChatClientModel extends AbstractModel {
 
-    private static final String TAG = "ExampleWebServiceModel";
+    private static final String TAG = "ChatClientModel";
 
-    private static final String GET_URL = "https://jsonplaceholder.typicode.com/todos/1";
-    private static final String POST_URL = "https://jsonplaceholder.typicode.com/posts";
+    private static final String URL = "https://testbed.jaysnellen.com:8443/SimpleChat/board";
+
+    private static final String USERNAME = "George Costanza";
+
+    private static String message;
 
     private MutableLiveData<JSONObject> jsonData;
 
     private String outputText;
 
     private final ExecutorService requestThreadExecutor;
-    private final Runnable httpGetRequestThread, httpPostRequestThread;
+    private final Runnable httpGetRequestThread, httpPostRequestThread, httpDeleteRequestThread;
     private Future<?> pending;
 
-    public ExampleWebServiceModel() {
+    public ChatClientModel() {
 
         requestThreadExecutor = Executors.newSingleThreadExecutor();
 
@@ -48,7 +52,7 @@ public class ExampleWebServiceModel extends AbstractModel {
                 /* Begin new request now, but don't wait for it */
 
                 try {
-                    pending = requestThreadExecutor.submit(new HTTPRequestTask("GET", GET_URL));
+                    pending = requestThreadExecutor.submit(new HTTPRequestTask("GET", URL));
                 }
                 catch (Exception e) { Log.e(TAG, " Exception: ", e); }
 
@@ -68,7 +72,27 @@ public class ExampleWebServiceModel extends AbstractModel {
                 /* Begin new request now, but don't wait for it */
 
                 try {
-                    pending = requestThreadExecutor.submit(new HTTPRequestTask("POST", POST_URL));
+                    pending = requestThreadExecutor.submit(new HTTPRequestTask("POST", URL));
+                }
+                catch (Exception e) { Log.e(TAG, " Exception: ", e); }
+
+            }
+
+        };
+
+        httpDeleteRequestThread = new Runnable() {
+
+            @Override
+            public void run() {
+
+                /* If a previous request is still pending, cancel it */
+
+                if (pending != null) { pending.cancel(true); }
+
+                /* Begin new request now, but don't wait for it */
+
+                try {
+                    pending = requestThreadExecutor.submit(new HTTPRequestTask("DELETE", URL));
                 }
                 catch (Exception e) { Log.e(TAG, " Exception: ", e); }
 
@@ -80,7 +104,7 @@ public class ExampleWebServiceModel extends AbstractModel {
 
     public void initDefault() {
 
-        setOutputText("Click the button to send an HTTP GET request ...");
+        sendGetRequest();
 
     }
 
@@ -107,8 +131,14 @@ public class ExampleWebServiceModel extends AbstractModel {
 
     // Start POST Request (called from Controller)
 
-    public void sendPostRequest() {
+    public void sendPostRequest(String s) {
         httpPostRequestThread.run();
+    }
+
+    // Start DELETE Request (called from Controller)
+
+    public void sendDeleteRequest() {
+        httpDeleteRequestThread.run();
     }
 
     // Setter / Getter Methods for JSON LiveData
@@ -117,7 +147,11 @@ public class ExampleWebServiceModel extends AbstractModel {
 
         this.getJsonData().postValue(json);
 
-        setOutputText(json.toString());
+        try {
+            setOutputText(json.getString("messages"));
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -181,11 +215,15 @@ public class ExampleWebServiceModel extends AbstractModel {
 
                 if (method.equals("POST") ) {
 
+                    StringBuilder sb = new StringBuilder();
+
                     conn.setDoOutput(true);
 
                     // Create request parameters (these will be echoed back by the example API)
 
-                    String p = "name=Jack+Flack&userid=2001";
+                    sb.append("{\"name\":\"").append(USERNAME).append("\",\"message\":\"")
+                            .append(message).append("\"}");
+                    String p = sb.toString();
 
                     // Write parameters to request body
 

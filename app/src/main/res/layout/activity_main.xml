@@ -13,6 +13,7 @@
         android:ems="10"
         android:hint="@string/input_field"
         android:inputType="textPersonName"
+        android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/deleteButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

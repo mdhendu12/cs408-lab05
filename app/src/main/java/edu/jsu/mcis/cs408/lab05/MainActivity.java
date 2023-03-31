@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements AbstractView {
         /* Create Controller and Models */
 
         controller = new DefaultController();
-        ExampleWebServiceModel model = new ExampleWebServiceModel();
+        ChatClientModel model = new ChatClientModel();
 
         /* Register Activity View and Model with Controller */
 
@@ -43,14 +43,14 @@ public class MainActivity extends AppCompatActivity implements AbstractView {
         binding.deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                controller.sendGetRequest();
+                controller.sendDeleteRequest();
             }
         });
 
         binding.postButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                controller.sendPostRequest();
+                controller.sendPostRequest(binding.input.getText().toString());
             }
         });
 
